@@ -113,7 +113,7 @@ Big-O of our methods compared to the spec:
 6. Final pass on comments and the README.
 
 ### Which stretch goals will be attempted or dropped?
-
+- Rainy places should get an umbrella while places that are not rainy should not include one. 
 - Reusable packing templates (like "Beach Trip"): we plan to attempt this one.
 - Saving and reloading trips: dropped, the project is about the chain and not files.
 - Weather API: dropped, it adds network code that does not test the chain. Also due to time restrictions we dont think we can pull this off.
