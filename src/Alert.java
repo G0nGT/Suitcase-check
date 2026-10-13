@@ -1,4 +1,4 @@
-/** A message describing one missing copy of an item. */
+/** A message describing one  missing copy of an item. */
 public class Alert
 {
     private String message;
