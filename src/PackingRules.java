@@ -1,6 +1,25 @@
-/** Fixed MVP packing recommendations, without a weather API. */
+/**
+ * PackingRules class that provides packing recommendations based on a trip's
+ * destination and duration, and checks for missing items without changing the
+ * packed items.
+ *
+ * @author Shresta Vangala
+ * @version 2026.10.13
+ */
 public class PackingRules
 {
+    // ----------------------------------------------------------
+    /**
+     * Creates a list of items required for the given trip. Every trip requires
+     * a passport, charger, and toothbrush, along with one tshirt per day. An
+     * umbrella is required for Seattle, London, and Vancouver.
+     *
+     * @param trip
+     *            the trip to create packing recommendations for
+     * @return a chain containing all required items
+     * @throws IllegalArgumentException
+     *             if the trip is null
+     */
     public LinkedChain<Item> getRequired(Trip trip)
     {
         if (trip == null)
@@ -24,7 +43,20 @@ public class PackingRules
         return required;
     }
 
-    /** Returns one alert per missing copy, leaving packed items unchanged. */
+    /**
+     * Checks the packed items against the trip's requirements. Creates one
+     * alert for each missing copy of a required item without changing the items
+     * already packed.
+     *
+     * @param trip
+     *            the trip whose packing requirements are checked
+     * @param manager
+     *            the manager containing the packed items
+     * @return a chain of alerts for all missing items, or an empty chain if
+     *             every required item is packed
+     * @throws IllegalArgumentException
+     *             if the trip or manager is null
+     */
     public LinkedChain<Alert> check(Trip trip, PackingManager manager)
     {
         if (manager == null)
