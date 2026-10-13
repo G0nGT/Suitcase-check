@@ -1,4 +1,4 @@
-/** A packed item. Names are case insensitive. */
+/** A packed item. Names do not care about cases */
 public class Item
 {
     private String name;

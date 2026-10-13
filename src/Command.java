@@ -1,4 +1,4 @@
-/** Parses commands & reports invalid input without stopping the program. */
+/** Parses commands and reports invalid input without stopping the program. */
 public class Command
 {
     private Trip currentTrip;
