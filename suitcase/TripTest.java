@@ -1,3 +1,4 @@
+package suitcase;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
@@ -38,5 +39,4 @@ public class TripTest
             catch (IllegalArgumentException expected) { }
         }
     }
-
 }

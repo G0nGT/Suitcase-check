@@ -1,3 +1,4 @@
+package suitcase;
 /** Stores the destination and duration of a trip. */
 public class Trip
 {

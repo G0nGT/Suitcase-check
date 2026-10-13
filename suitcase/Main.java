@@ -1,3 +1,4 @@
+package suitcase;
 import java.util.Scanner;
 
 /** Starts the console application. */

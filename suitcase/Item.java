@@ -1,3 +1,4 @@
+package suitcase;
 /** A single packed item. Names are case insensitive. */
 public class Item
 {

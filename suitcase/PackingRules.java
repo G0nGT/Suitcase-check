@@ -1,3 +1,4 @@
+package suitcase;
 /** Fixed MVP packing recommendations, without a weather API. */
 public class PackingRules
 {

@@ -1,8 +1,11 @@
+package suitcase;
 /** A message describing one missing copy of an item. */
 public class Alert
 {
+    // ~ Fields ................................................................
     private String message;
 
+    // ~ Constructor ...........................................................
     public Alert(String alertMessage)
     {
         if (alertMessage == null || alertMessage.trim().length() == 0)
@@ -12,6 +15,7 @@ public class Alert
         message = alertMessage.trim();
     }
 
+    // ~ Methods ...............................................................
     public String getMessage()
     {
         return message;

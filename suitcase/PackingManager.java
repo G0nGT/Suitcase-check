@@ -1,3 +1,4 @@
+package suitcase;
 /** Manages packed items through the chain's public methods. */
 public class PackingManager
 {

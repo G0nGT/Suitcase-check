@@ -1,3 +1,4 @@
+package suitcase;
 /** Parses commands and reports invalid input without stopping the program. */
 public class Command
 {
