@@ -1,9 +1,21 @@
 import student.TestCase;
+
+/**
+ * Tests packing, unpacking, counting, and listing items.
+ */
 public class PackingManagerTest extends TestCase
 {
 
     private PackingManager manager;
+
+    /**
+     * Creates a new PackingManager object before each test.
+     */
     public void setUp() { manager = new PackingManager(); }
+
+    /**
+     * Tests packing and counting duplicate items regardless of capitalization.
+     */
     public void testPackAndCount()
     {
         manager.packItem("Shirt");
@@ -13,6 +25,10 @@ public class PackingManagerTest extends TestCase
         assertEquals(2, manager.countItem("shirt"));
         assertEquals(2, manager.getItemCount());
     }
+
+    /**
+     * Tests that invalid item names are rejected without changing contents.
+     */
     public void testInvalidPackPreservesContents()
     {
         manager.packItem("shirt");
@@ -25,6 +41,10 @@ public class PackingManagerTest extends TestCase
             assertEquals(1, manager.countItem("shirt"));
         }
     }
+
+    /**
+     * Tests that unpacking removes only one copy regardless of capitalization.
+     */
     public void testUnpackOneCopy()
     {
         manager.packItem("shirt"); manager.packItem("shirt");
@@ -34,6 +54,10 @@ public class PackingManagerTest extends TestCase
         assertEquals(1, manager.countItem("pants"));
         assertEquals(2, manager.getItemCount());
     }
+
+    /**
+     * Tests unpacking missing items and rejecting a null item name.
+     */
     public void testMissingAndEmptyUnpack()
     {
         assertFalse(manager.unpackItem("shoes"));
@@ -44,6 +68,10 @@ public class PackingManagerTest extends TestCase
         catch (IllegalArgumentException expected) { }
         assertEquals(1, manager.getItemCount());
     }
+
+    /**
+     * Tests counting an absent item and rejecting an empty item name.
+     */
     public void testCountAbsentAndInvalid()
     {
         assertEquals(0, manager.countItem("shirt"));
@@ -51,6 +79,10 @@ public class PackingManagerTest extends TestCase
         try { manager.countItem(""); fail("Empty name accepted"); }
         catch (IllegalArgumentException expected) { }
     }
+
+    /**
+     * Tests that listing preserves item order, duplicates, and contents.
+     */
     public void testListPreservesContentsAndDuplicates()
     {
         manager.packItem("shirt"); manager.packItem("pants");
@@ -58,6 +90,11 @@ public class PackingManagerTest extends TestCase
         assertEquals("shirt\npants\nshirt", manager.list());
         assertEquals(3, manager.getItemCount());
     }
+
+    /**
+     * Tests listing and counting items when empty and after unpacking
+     * the last item.
+     */
     public void testEmptyListAndCount()
     {
         assertEquals("No items packed.", manager.list());

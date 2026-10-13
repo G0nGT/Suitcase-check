@@ -1,9 +1,24 @@
 import student.TestCase;
+
+/**
+ * Tests the commands used to create trips and manage packed items.
+ */
 public class CommandTest extends TestCase
 {
 
     private Command command;
+
+    /**
+     * Creates a new Command object before each test.
+     */
     public void setUp() { command = new Command(); }
+
+    /**
+     * Runs a command and captures its printed output.
+     *
+     * @param input the command to process
+     * @return the output with normalized line endings
+     */
     private String run(String input)
     {
         java.io.PrintStream old = System.out;
@@ -18,6 +33,10 @@ public class CommandTest extends TestCase
         }
         finally { System.setOut(old); capture.close(); }
     }
+
+    /**
+     * Tests creating a trip, packing items, listing items, and unpacking.
+     */
     public void testFullHappyPath()
     {
         assertTrue(run("trip Seattle 1").contains("Trip to Seattle, 1 days."));
@@ -28,6 +47,10 @@ public class CommandTest extends TestCase
         assertTrue(run("unpack charger").contains("Unpacked: charger"));
         assertEquals("Missing: charger\n", run("check"));
     }
+
+    /**
+     * Tests that unknown and empty commands preserve packed items.
+     */
     public void testUnknownAndEmptyCommandsPreserveState()
     {
         run("pack Shirt");
@@ -40,6 +63,10 @@ public class CommandTest extends TestCase
         }
         assertTrue(run("pack pants").contains("Packed: pants"));
     }
+
+    /**
+     * Tests that invalid trip commands preserve the current trip.
+     */
     public void testBadTripPreservesCurrentTrip()
     {
         run("trip Phoenix 1");
@@ -52,6 +79,10 @@ public class CommandTest extends TestCase
             assertEquals(before, run("check"));
         }
     }
+
+    /**
+     * Tests checking before a trip exists and processing invalid items.
+     */
     public void testCheckBeforeTripAndInvalidItems()
     {
         assertTrue(run("check").contains("Create a trip"));
@@ -64,6 +95,10 @@ public class CommandTest extends TestCase
         assertTrue(run("unpack shoes").contains("Item not in suitcase"));
         assertTrue(run("trip Phoenix 1").contains("Trip to"));
     }
+
+    /**
+     * Tests packing duplicate items and unpacking one copy at a time.
+     */
     public void testDuplicatePackAndUnpack()
     {
         run("pack SHIRT"); run("pack shirt");
@@ -72,6 +107,11 @@ public class CommandTest extends TestCase
         run("unpack shirt");
         assertEquals("No items packed.\n", run("list"));
     }
+
+    /**
+     * Tests that new trips retain items and support multiword city names.
+     * Also tests command capitalization and extra spaces.
+     */
     public void testNewTripRetainsItemsAndSupportsMultiwordCity()
     {
         run("pack charger");
