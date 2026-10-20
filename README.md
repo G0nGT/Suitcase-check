@@ -19,9 +19,11 @@ Some locations are prone to rain year round so if the location is Seattle, Londo
 
 From the project folder run these commands:
 
+```bash
 mkdir bin
 javac -cp lib/student.jar -d bin src/*.java test/*.java
 java -cp bin Main
+```
 
 ### How to run the JUnit tests
 
