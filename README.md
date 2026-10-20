@@ -221,6 +221,6 @@ This table retains the original task assignments. The final design keeps `quit` 
 
 ## GenAI Use Note
 
-We used GenAI to help format the test plan and figure out what test cases we needed. We also used it to give guidance on the project when we stuck on debugging, on some logic errors, and when we could not figure out why our program was not working properly 
+We used GenAI to help format the test plan and figure out what test cases we needed. We also used it to give guidance on the project when we stuck on debugging, on some logic errors, and when we could not figure out why our program was not working properly.We also used GenAI to create the system diagram showing the relationships between our classes and how LinkedChain is reused for Item and Alert objects.
 
 GenAI was used on the source and test files to help with logical errors and debugging problems
