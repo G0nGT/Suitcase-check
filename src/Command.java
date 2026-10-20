@@ -21,7 +21,8 @@ public class Command
         String input = command.trim();
         String[] parts = input.split("\\s+", 2);
         String action = parts[0].toLowerCase(java.util.Locale.ROOT);
-        String argument = parts.length == 2 ? parts[1].trim().replaceAll("\\s+", " ") : "";
+        String argument = parts.length == 2
+            ? parts[1].trim().replaceAll("\\s+", " ") : "";
         try
         {
             if (action.equals("trip"))
@@ -64,6 +65,10 @@ public class Command
                     System.out.println("Item not in suitcase: " + argument);
                 }
             }
+            else if (action.equals("template"))
+            {
+                applyTemplate(argument);
+            }
             else if (action.equals("list") && argument.length() == 0)
             {
                 System.out.println(packingManager.list());
@@ -95,9 +100,38 @@ public class Command
         }
     }
 
+    /** Adds missing template items without duplicating existing items. */
+    private void applyTemplate(String name)
+    {
+        String[] items;
+        if (name.equalsIgnoreCase("beach"))
+        {
+            items = new String[] {"sunscreen", "swimsuit", "towel"};
+        }
+        else if (name.equalsIgnoreCase("business"))
+        {
+            items = new String[] {"laptop", "notebook", "formal shirt"};
+        }
+        else
+        {
+            System.out.println("Use: template beach or template business");
+            return;
+        }
+        for (String item : items)
+        {
+            if (packingManager.countItem(item) == 0)
+            {
+                packingManager.packItem(item);
+            }
+        }
+        System.out.println("Applied template: "
+            + name.toLowerCase(java.util.Locale.ROOT));
+    }
+
     private void printHelp()
     {
         System.out.println("Unknown command");
-        System.out.println("Commands: trip destination days, pack item, unpack item, list, check, quit");
+        System.out.println("Commands: trip destination days, pack item, "
+            + "unpack item, list, check, template beach/business, quit");
     }
 }

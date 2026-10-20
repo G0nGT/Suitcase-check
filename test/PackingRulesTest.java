@@ -80,4 +80,20 @@ public class PackingRulesTest extends TestCase
         assertTrue(rules.check(new Trip("Phoenix", 1), manager).isEmpty());
     }
 
+    /** Tests all configured cities and an unlisted destination. */
+    public void testExpandedRainyCities()
+    {
+        PackingRules rules = new PackingRules();
+        String[] cities = {"Seattle", "London", "Vancouver", "Portland",
+            "Dublin", "Glasgow", "Amsterdam", "Singapore", "Hong Kong"};
+        for (String city : cities)
+        {
+            LinkedChain<Item> required =
+                rules.getRequired(new Trip(city.toLowerCase(), 1));
+            assertEquals(1, required.count(new Item("umbrella")));
+        }
+        assertEquals(0, rules.getRequired(new Trip("Phoenix", 1))
+            .count(new Item("umbrella")));
+    }
+
 }

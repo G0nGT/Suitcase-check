@@ -120,4 +120,31 @@ public class CommandTest extends TestCase
         assertTrue(run("  PACK   rain jacket  ").contains("Packed: rain jacket"));
     }
 
+    /** Tests both templates, repeats, and invalid template names. */
+    public void testTemplates()
+    {
+        run("pack towel");
+        assertTrue(run("template beach").contains("Applied template: beach"));
+        String beach = run("list");
+        assertTrue(beach.contains("sunscreen"));
+        assertTrue(beach.contains("swimsuit"));
+        assertEquals(3, beach.trim().split("\n").length);
+        run("template beach");
+        assertEquals(beach, run("list"));
+        assertTrue(run("template").contains("Use: template"));
+        assertTrue(run("template unknown").contains("Use: template"));
+        assertEquals(beach, run("list"));
+        run("  TEMPLATE   BUSINESS  ");
+        String both = run("list");
+        assertTrue(both.contains("laptop"));
+        assertTrue(both.contains("notebook"));
+        assertTrue(both.contains("formal shirt"));
+        assertEquals(6, both.trim().split("\n").length);
+        run("template business");
+        assertEquals(both, run("list"));
+        run("unpack towel");
+        run("template beach");
+        assertEquals(6, run("list").trim().split("\n").length);
+    }
+
 }
