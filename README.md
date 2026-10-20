@@ -1,131 +1,188 @@
 # Suitcase Check
 
-This project is Suitcase Check. It is a command line program that helps college students like us plan for a trip without missing important items. It works by the user inputting how many days they are going for a trip, the location, and once they think they have everything they can use the check function to verify everything is packed, and if something isnt it throws alerts.
+This project is Suitcase Check. It is a command line program that helps college students like us plan for a trip without missing important items. The user enters the destination and number of days, packs items, and uses the check command to see whether anything required is missing.
 
-Commands:
-- `trip <destination> <days>` This starts the trip with the destination and the number of days 1-30.
-- `pack <item>` packs an item and puts it inside of the suitcase
-- `unpack <item>` unpacks item and removes it from suitcase
-- `list` lists the items inside
-- `check` the verification check that either says it is all set or missing items
-- `quit` exits
+## Commands
 
-Some items are always required like a passport, charger, toothbrush, and at least one tshirt per the day.
-Some locations are prone to rain year round so if the location is Seattle, London, or Vancouver then an umbrella is necessary
+- `trip <destination> <days>` starts a trip with a destination and a number of days from 1–30.
+- `pack <item>` adds one copy of an item to the suitcase.
+- `unpack <item>` removes one copy of an item from the suitcase.
+- `list` lists the items inside.
+- `check` prints "All set." or alerts for missing required items.
+- `template beach` adds sunscreen, a swimsuit, and a towel.
+- `template business` adds a laptop, a notebook, and a formal shirt.
+- `quit` exits the program.
+
+Templates only add items that are not already packed. Applying the same template twice does not add duplicates. Templates do not change the required-item rules.
+
+Some items are always required: a passport, charger, toothbrush, and one tshirt per day. Our fixed umbrella rule applies to Seattle, London, Vancouver, Portland, Dublin, Glasgow, Amsterdam, Singapore, and Hong Kong. This rule uses a city list, not live weather data.
+
+Item names are case insensitive and must contain 1–30 characters using letters, spaces, and hyphens. A new trip replaces the previous trip but keeps the packed items.
+
+### Example
+
+Enter one command at a time:
+
+```text
+trip London 2
+pack passport
+pack charger
+pack toothbrush
+pack tshirt
+pack tshirt
+pack umbrella
+check
+template beach
+list
+quit
+```
+
+The check command in this example prints "All set."
 
 ## Compile and Run
 
+Use JDK 17. The project includes `lib/student.jar`, which is needed to compile and run the tests.
+
 ### How to compile and run the program
 
-From the project folder run these commands:
+Open a terminal in the project folder, where `src`, `test`, and `lib` are located.
 
-```bash
+If the `bin` folder does not already exist, create it:
+
+```text
 mkdir bin
+```
+
+Compile the source files and tests, then start the program:
+
+```text
 javac -cp lib/student.jar -d bin src/*.java test/*.java
 java -cp bin Main
 ```
 
 ### How to run the JUnit tests
 
-Once it compiles on windows run this: 
+After compiling, run this on Windows:
 
+```text
 java -cp "bin;lib/student.jar" org.junit.runner.JUnitCore AlertTest CommandTest ItemTest LinkedChainTest MainTest PackingManagerTest PackingRulesTest TripTest
+```
 
-To run the test folders click the test folder and chooose Run as > JUnit Test
+On macOS or Linux, use a colon in the classpath:
 
-make sure to use Java 17 because some of our test cases fail when a new version is implemented
+```text
+java -cp "bin:lib/student.jar" org.junit.runner.JUnitCore AlertTest CommandTest ItemTest LinkedChainTest MainTest PackingManagerTest PackingRulesTest TripTest
+```
+
+In Eclipse, right-click `Main.java` and choose **Run As > Java Application** to run the program. Right-click the `test` folder and choose **Run As > JUnit Test** to run the tests.
+
+The current build was compiled and tested on Java 17. All 50 tests passed.
+
+## System Diagram
+
+```mermaid
+flowchart TD
+    Main["Main"] --> Command["Command"]
+    Command --> Trip["Trip"]
+    Command --> Manager["PackingManager"]
+    Command --> Rules["PackingRules"]
+    Rules --> Trip
+    Rules --> Manager
+    Manager --> Packed["LinkedChain<Item>: packed items"]
+    Rules --> Required["LinkedChain<Item>: required items"]
+    Rules --> Alerts["LinkedChain<Alert>: missing-item alerts"]
+```
+
+`Main` reads input and handles `quit`. `Command` processes the other commands, including packing templates. `Trip` stores the destination and days. `PackingManager` stores packed items, and `PackingRules` builds the required list and checks for missing items.
+
+The same generic `LinkedChain<T>` class is reused for both `Item` and `Alert` objects. The application classes access the chain through its public methods.
+
 ## Reflection
 
 ### What changed from the specification, and why?
 
-the main design pretty much stayed the same, with main starting the program and commmand handling the input, while trip, packaging manager, and packingRules do the work of the program.
+The main design pretty much stayed the same, with `Main` starting the program and `Command` handling input, while `Trip`, `PackingManager`, and `PackingRules` do the work of the program.
 
+- **Command methods.** The spec had separate methods for commands (`startTrip`, `packing`, `unpacking`, and so on). To make it simpler, we wrote one `processCommand` method that checks which command was typed, since the commands share input parsing.
+- **PackingManager.** We added `countItem` and `getItemCount`. `check()` has to know how many copies of the same item are in the suitcase, and the tests need to check the suitcase without reading the list text.
+- **PackingRules.** The spec left `check(...)` vague. It is now `check(Trip, PackingManager)` and returns a `LinkedChain<Alert>`. `getRequired(Trip)` returns a `LinkedChain<Item>`.
+- **Where validation lives.** The spec said invalid input would re-prompt inside the constructors. We changed it so that `Trip`, `Item`, and `Alert` throw an `IllegalArgumentException`, and `Command` prints the exception message. The user can then type the next command. This makes validation easier to test.
+- **Item names.** Checking the item name moved from `PackingManager.packItem()` into the `Item` constructor. Names must contain 1–30 characters using letters, spaces, and hyphens. Numbers and apostrophes are not supported.
+- **Days.** The spec table only mentioned negative numbers and zero. We used the scope's range of 1–30. Invalid days print "Days must be 1 to 30."
+- **Tests.** We added test files for `Item`, `Alert`, `Trip`, and `Main`, since validation and input handling are covered by those classes. Where the test plan said `packItem("")` should leave the suitcase alone, the test now expects an exception and checks that the count stays the same.
+- **Constants and cities.** Required basic items and umbrella cities are stored in named constants. The umbrella list was expanded from three cities to nine.
+- **Templates.** We added simple beach and business templates. Each template adds missing items without duplicating items already in the suitcase.
 
-Command 
-- **Command methods.** The spec had these ones to start the command (`startTrip`,
-  `packing`, `unpacking`, and so on). To make it simpler we just wrote one `processCommand` method that checks which
-  command was typed, since they all needed the same input parsing so it just sped up the process.
-- **PackingManager.** We added `countItem` and `getItemCount`. `check()` has to know how many copies of the same item are in the backpack, and the tests need to check the suitcase while not reading the list text
-
-- **PackingRules.** The spec left `check(...)` vague and it wasnt detailed . It is now `check(Trip, PackingManager)`
-  and returns a `LinkedChain<Alert>`. `getRequired(Trip)` returns a `LinkedChain<Item>`.
-- **Where validation lives.** The spec said invalid input would re-prompt inside the
-  constructors. We changed it so that instead, `Trip`, `Item`, and `Alert` throw an `IllegalArgumentException`, and
-  `Command` prints the message the exception throughs. The user can just type the next command. We did this for testing purposes because it is easier to check
-- **Item names.** Checking the item name moved from `PackingManager.packItem()` into the `Item` 
-  constructor. the names have to be 1-30 chars, and onlyl letters spaces and hyphens
-- **Days.** The spec table only said negative or 0. We used the scope's range of 1 to 30.
-  Text for the days prints "Days must be 1 to 30."
-- **Tests.** We added test files for `Item`, `Alert`, `Trip`, and `Main`, since we moved
-  validation into those classes. 
-  
-  Where the test plan said `packItem("")` should leave the
-  suitcase alone, the test now expects the exception and ensures that the count stays the same
-
-Smaller things we decided while coding: a new `trip` replaces the old one but keeps the
-suitcase, item names are not case sensitive, and `quit` is handled in `Main`. Also, `list`
-prints the newest item first because `LinkedChain.add()` puts new entries at the front.
-
-These came from talking it over as a group while we implemented.
+Smaller things we decided while coding: a new `trip` replaces the old one but keeps the suitcase, item names are not case sensitive, and `quit` is handled in `Main`. Also, `list` prints the newest item first because `LinkedChain.add()` puts new entries at the front.
 
 ### What changed in LinkedChain, and why?
 
-Nothing, we used it as given. We only call the public methods: add, remove, contains, count, size, isEmpty, and toArray.  The same class holds `Item` objects in the suitcase
-and the required list, and `Alert` objects for the check results, so copies arent neccesary. For `remove` and `count` to work on items, we had to write `equals` and `hashCode`
-in `Item`.
+Nothing, we used it as given. We only call the public methods: `add`, `remove`, `contains`, `count`, `size`, `isEmpty`, and `toArray`. The same generic class holds `Item` objects in the suitcase and required list, and `Alert` objects for check results, so separate chain implementations are not necessary. For `remove` and `count` to work on items, we wrote `equals` and `hashCode` in `Item`.
 
 Big-O of our methods compared to the spec:
 
-- `packItem` is O(1), same as the spec
-- `unpackItem` is O(n), same as the spec
-- `PackingRules.check is O(n²) in the worst case because it repeatedly calls contains and count, which each scan a chain. The 1–30 day limit bounds the required list, but it does not limit how many items the user can pack. 
-- `processCommand depends on the command being processed. list and unpack are O(n), while check can be O(n²), so its overall worst-case complexity is O(n²).
+Let n be the number of packed items. Item names are limited to 30 characters.
+
+- `packItem` is O(1), same as the spec.
+- `unpackItem` is O(n), same as the spec.
+- `list` and `countItem` are O(n).
+- `PackingRules.check` is O(n) for the current rules. The required list has at most 34 entries: three basics, up to 30 tshirts, and one umbrella. It scans the packed chain for a fixed number of distinct required items. Our earlier O(n²) estimate treated the required list as growing without a fixed limit.
+- Applying a template is O(n), since each template checks three items against the packed chain.
+- `processCommand` depends on the command. Commands such as `list`, `unpack`, `check`, and `template` are O(n), so its worst-case complexity with the current rules is O(n).
+
+The 1–30 day limit bounds the required list, but it does not limit how many items the user can pack.
+
 ### Which unknowns were resolved, and which remain open?
 
-- **How to make a generic LinkedChain work with multiple object types.** One
-  `LinkedChain<T>` is used for `Item` and `Alert` and it depends on `equals`.
-- **How to make packing recommendations.**  We used a small fixed set of
-  rules (basics, a tshirt per day, an umbrella for three cities). Still open is a nicer way to
-  organize rules so we can add more without a long chain of if statements, and getting real
-  weather data if we have the time to do so.
-- **Odd item names.** The scope said we would think about this later. We picked 30 characters
-  and letters, spaces, and hyphens only, but we have not decided if numbers or apostrophes
-  should be allowed.
+- **How to make a generic LinkedChain work with multiple object types.** One `LinkedChain<T>` implementation is used for `Item` and `Alert`. Item matching depends on `equals`.
+- **How to make packing recommendations.** We used a small fixed set of rules: basics, a tshirt per day, and an umbrella for nine cities. Named constants make the basic items and cities easier to change. Live weather recommendations remain outside the project.
+- **Odd item names.** We chose a 30-character limit and allow letters, spaces, and hyphens. Numbers and apostrophes remain unsupported.
+- **How templates should handle duplicates.** Templates add one copy only when the item is not already packed. Applying a template again leaves existing items unchanged.
 
 ### What does not work yet?
 
-- None of the stretch goals (weather, saving trips, templates) are done.
-- The required list is fixed, and only Seattle, London, and Vancouver get an umbrella, we can figure out more rainy places
-- Item names with numbers or apostrophes are rejected
-- `quit` only works from `Main`. If you call `processCommand("quit")` it says unknown command.
-- There is no loop that keeps asking until the input is valid. It prints the error and waits for
-  the next command. We have to fix this
-- No test changes the trip between two `check` commands.
+- Saving and reloading trips are not implemented. Packed items and trip information are lost when the program exits.
+- There is no live weather API. Umbrella recommendations use a fixed list of nine cities.
+- Item names with numbers or apostrophes are rejected.
+- Only beach and business templates are available. Users cannot create custom templates.
+- Templates add items but do not change what `check` considers required.
+
+`quit` is intentionally handled by `Main`. Invalid input prints an error and lets the user enter another command; the program does not stop or repeatedly prompt for the same field.
 
 ## Next Steps
 
 ### What is left to finish the MVP, and in what order?
 
-1. Run all the tests with the real `student.TestCase` on Java 17 and fix anything that breaks, or maybe make student test case compatible with all java versions.
-2. Decide the item name rules (numbers, apostrophes) and update `Item` and `ItemTest`.
-3. Clean up `PackingRules.check` so it is faster, or fix the Big-O estimate in the spec.
-4. Move `quit` into `Command` so all commands are handled in one place.
-5. Put the required items and rainy cities into named constants so they are easy to change, and add more rainy cities!
-6. Final pass on comments and the README.
+The implemented MVP compiles and runs on Java 17, and all 50 tests pass. The umbrella city list and basic items use named constants, and the beach and business templates are implemented.
 
-### Which stretch goals will be attempted or dropped?
-- Rainy places should get an umbrella while places that are not rainy should not include one. 
-- Reusable packing templates (like "Beach Trip"): we plan to attempt this one.
-- Saving and reloading trips: dropped, the project is about the chain and not files.
-- Weather API: dropped, it adds network code that does not test the chain. Also due to time restrictions we dont think we can pull this off.
+The remaining final checks are:
 
-### What new tests are needed?
+1. Review comments and confirm that the README matches the submitted code.
+2. Review test coverage against the required normal and bad-input cases for public methods.
+3. Confirm that the final code, tests, README, and system diagram are in the public GitHub repository.
+4. Prepare the presentation and live demo.
 
-- `Item`: names with numbers and apostrophes, and exactly 30 and 31 characters.
-- `PackingRules.check`: a suitcase with lots of duplicates, and a trip changed between checks.
-- `Command`: `quit` through `processCommand`, and extra spaces in commands.
-- Templates: applying a template adds the right items, an unknown template name is rejected
-  and does not change the suitcase, and applying one twice.
+### Which stretch goals were completed or dropped?
+
+- **Expanded umbrella city list: completed.** Nine configured cities require an umbrella. Other destinations do not receive this requirement.
+- **Reusable packing templates: completed.** Beach and business templates add preset items without duplicating items already packed.
+- **Saving and reloading trips: dropped.** The project focuses on the chain rather than file storage.
+- **Weather API: dropped.** It adds network code that does not test the chain and was outside our time limit.
+
+### What new tests were added, and what could be added later?
+
+Added tests cover:
+
+- All nine umbrella cities, case-insensitive city matching, and a destination outside the list.
+- Beach and business templates adding the correct items.
+- Applying the same template twice without adding duplicates.
+- Preserving existing packed items when applying a template.
+- Rejecting missing or unknown template names without changing the suitcase.
+- Adding a template item again after it has been unpacked.
+
+Existing command tests also cover command capitalization, extra spaces, duplicate packing, invalid input, and retaining packed items when changing trips.
+
+Future tests could cover a much larger suitcase with many duplicates and changing to a different valid trip between two `check` commands.
 
 ### Who does what?
 
@@ -138,6 +195,8 @@ Big-O of our methods compared to the spec:
 | Constants for required items | Shresta |
 | Packing templates and their tests | Shresta, Nie |
 | Comments and final README | Luc |
+
+This table retains the original task assignments. The final design keeps `quit` in `Main`, so the planned move into `Command` was not carried out.
 
 ## Work Attribution
 
@@ -165,4 +224,3 @@ Big-O of our methods compared to the spec:
 We used GenAI to help format the test plan and figure out what test cases we needed. We also used it to give guidance on the project when we stuck on debugging, on some logic errors, and when we could not figure out why our program was not working properly 
 
 GenAI was used on the source and test files to help with logical errors and debugging problems
-
