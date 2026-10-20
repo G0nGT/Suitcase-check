@@ -76,9 +76,8 @@ Big-O of our methods compared to the spec:
 
 - `packItem` is O(1), same as the spec
 - `unpackItem` is O(n), same as the spec
-- `PackingRules.check` is O(n^2). it isnt like how the spec thought it was (O(n)). It required the usage of contains and count on chains, so it is O(n^2), but its through the 1-30 range so it stays small 
-- `processCommand` isnt O(1) but rather O(n) because list, unpack, and check all walk the chain. 
-
+- `PackingRules.check is O(n²) in the worst case because it repeatedly calls contains and count, which each scan a chain. The 1–30 day limit bounds the required list, but it does not limit how many items the user can pack. 
+- `processCommand depends on the command being processed. list and unpack are O(n), while check can be O(n²), so its overall worst-case complexity is O(n²).
 ### Which unknowns were resolved, and which remain open?
 
 - **How to make a generic LinkedChain work with multiple object types.** One
